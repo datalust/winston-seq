@@ -1,0 +1,55 @@
+{
+  "name": "@datalust/winston-seq",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "A Winston v3 transport for Seq",
+  "author": "Datalust and contributors",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint --fix src/** test/**"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint && jest --onlyChanged",
+      "pre-push": "yarn lint && jest"
+    }
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "seq-logging": "^1.0.0",
+    "winston-transport": "^4.4.0"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/jest": "^26.0.24",
+    "@types/winston": "^2.4.4",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
+    "eslint": "^7.30.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "husky": "^7.0.1",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.5"
+  },
+  "homepage": "https://github.com/datalust/seq-logging",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datalust/winston-seq.git"
+  },
+  "keywords": [
+    "winston",
+    "logging",
+    "winston-transport",
+    "winston-seq",
+    "seq"
+  ]
+}

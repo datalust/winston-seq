@@ -7,7 +7,6 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:jest/recommended',
   ],
-  parserOptions: { project: './tsconfig.json' },
   env: { 'jest/globals': true },
   ignorePatterns: ['node_modules', 'dist', 'coverage'],
   rules: {
@@ -15,6 +14,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': [
       'error', { 'fixToUnknown': true, 'ignoreRestArgs': true },
     ],
+    '@typescript-eslint/ban-ts-comment': 'off',
     // ES:off + TS:on
     'semi': 'off',
     '@typescript-eslint/semi': ['error', 'never'],
@@ -27,6 +27,7 @@ module.exports = {
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
     // ES
+    'no-trailing-spaces': 'error',
     'max-len': ['error', { 'code': 80 }],
     'eol-last': ['error', 'always'],
     'no-tabs': ['error', { 'allowIndentationTabs': false }],

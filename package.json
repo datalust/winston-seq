@@ -8,10 +8,12 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest test/*.spec.ts",
+    "test:integration": "jest test/*.test.ts",
+    "test:watch": "jest --watch test/*.spec.ts",
     "test:coverage": "jest --coverage",
-    "lint": "eslint --fix src/** test/**"
+    "lint": "eslint --fix src/** test/**",
+    "docker:seq": "docker run --name seq -d --restart unless-stopped -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest"
   },
   "husky": {
     "hooks": {

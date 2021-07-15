@@ -1,22 +1,31 @@
-import seq from 'seq-logging'
+import * as seq from 'seq-logging'
 import TransportStream from 'winston-transport'
+
+enum WinstonLevels {
+  error = 'error',
+  warn = 'warn',
+  info = 'info',
+  http = 'http',
+  verbose = 'verbose',
+  debug = 'debug',
+  silly = 'silly',
+}
 
 //
 // Inherit from `winston-transport` so you can take advantage
 // of the base functionality and `.exceptions.handle()`.
 //
-module.exports = class SeqTransport extends TransportStream {
-  private logger: seq.Logger
-  constructor(
-    config: seq.SeqLoggerConfig, 
-    opts?: TransportStream.TransportStreamOptions
-  ) {
-    // options.handleExceptions 
-    // - If true, info with { exception: true } will be written.
-    super(opts)
-    this.logger = new seq.Logger(config)    
+class SeqTransport extends TransportStream {
+  public logger: seq.Logger
 
-    setImmediate(() => this.emit('opened:seq'))
+  constructor (
+    config: seq.SeqLoggerConfig,
+    opts: TransportStream.TransportStreamOptions = {}
+  ) {
+    super(Object.assign(opts))
+
+    this.logger = new seq.Logger(config)
+    setImmediate(() => this.emit('opened'))
   }
 
   /**
@@ -24,31 +33,56 @@ module.exports = class SeqTransport extends TransportStream {
  * @param {Info} info - Winston log information.
  * @param {Function} next - Continuation to respond to when complete.
  * @returns {void}
- */  
-  log(info: unknown, next: () => void): void {
-    setImmediate(() => {
-      // TODO: Perform the writing to seq instance
-      // Not sure whether to override the stream writer (TransportStream) 
-      //  or use the emit below.....
+ */
+  log (info: unknown, next: () => void): void {
+    const { level, message, ...rest } =
+    <{ level:string, message: string }>info
 
-      // this.logger.emit({
-      //   timestamp: new Date(),
-      //   level: 'Information',
-      //   messageTemplate: 'Hello for the {n}th time, {user}!',
-      //   // exception: ,
-      //   properties: {
-      //     user: process.env.USERNAME,
-      //     nn: 20,
-      //   },
-      // })
+    const timestamp = new Date()
+    setImmediate(() => {
+      this.logger.emit({
+        timestamp,
+        level: this.mapLevel(level),
+        messageTemplate: message,
+        properties: rest,
+        /*
+          exception:
+            Unsure if this can be used 🤷‍♂️
+            super has a handleExceptions option 💡
+        */
+      })
+
+      setImmediate(() => this.emit('logged', info))
     })
 
-    this.emit('logged:seq', info)
     next()
   }
 
-  close(): void {
-    this.logger.close()
-    setImmediate(() => this.emit('closed:seq'))
-  }  
+  close (): void {
+    setImmediate(() => {
+      this.logger.flush().then(() => {
+        setImmediate(() => this.emit('flushed', this.logger))
+        this.logger.close().then(() => {
+          setImmediate(() => this.emit('closed', this.logger))
+        })
+      })
+    })
+  }
+
+  private mapLevel (level: string){
+    switch (level) {
+      // Note: There is no equivalent for the Seq 'Fatal'
+      case WinstonLevels.error: return 'Error'
+      case WinstonLevels.warn: return 'Warning'
+      case WinstonLevels.http:
+      case WinstonLevels.info: return 'Information'
+      case WinstonLevels.debug: return 'Debug'
+      case WinstonLevels.silly:
+      case WinstonLevels.verbose: return 'Verbose'
+      default:
+        throw new Error(`Unknown logging level ${level}`)
+    }
+  }
 }
+
+export default SeqTransport

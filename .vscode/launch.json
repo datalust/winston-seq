@@ -1,0 +1,84 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Current TS File",
+      "type": "node",
+      "request": "launch",
+      "args": [
+        "${relativeFile}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy",
+        "-r",
+        "ts-node/register"
+      ],
+      "sourceMaps": true,
+      "protocol": "inspector",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "outputCapture": "std",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Jest single run all tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "CI": "true"
+      },
+      "args": [
+        "-i", // Run in-band
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Jest single run current file",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "CI": "true"
+      },
+      "args": [
+        "${fileBasename}",
+        "-i", // Run in-band
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Jest watch all tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceRoot}",
+      "args": [
+        "-i", // Run in-band
+        "--watchAll"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Jest watch current file",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "cwd": "${workspaceRoot}",
+      "args": [
+        "${fileBasename}",
+        "-i", // Run in-band
+        "--watchAll"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

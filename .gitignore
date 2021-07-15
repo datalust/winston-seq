@@ -105,4 +105,5 @@ dist
 
 .directory
 
-.vscode
+.vscode/*
+!.vscode/launch.json

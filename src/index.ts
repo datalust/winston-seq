@@ -18,12 +18,10 @@ enum WinstonLevels {
 class SeqTransport extends TransportStream {
   public logger: seq.Logger
 
-  constructor(
+  constructor (
     config: seq.SeqLoggerConfig,
     opts: TransportStream.TransportStreamOptions = {}
   ) {
-    // options.handleExceptions
-    // - If true, info with { exception: true } will be written.
     super(Object.assign(opts))
 
     this.logger = new seq.Logger(config)
@@ -36,17 +34,22 @@ class SeqTransport extends TransportStream {
  * @param {Function} next - Continuation to respond to when complete.
  * @returns {void}
  */
-  log(info: unknown, next: () => void): void {
+  log (info: unknown, next: () => void): void {
     const { level, message, ...rest } =
     <{ level:string, message: string }>info
 
+    const timestamp = new Date()
     setImmediate(() => {
       this.logger.emit({
-        timestamp: new Date(),
+        timestamp,
         level: this.mapLevel(level),
         messageTemplate: message,
-        // exception: ,
         properties: rest,
+        /*
+          exception:
+            Unsure if this can be used 🤷‍♂️
+            super has a handleExceptions option 💡
+        */
       })
 
       setImmediate(() => this.emit('logged', info))
@@ -55,7 +58,7 @@ class SeqTransport extends TransportStream {
     next()
   }
 
-  close(): void {
+  close (): void {
     setImmediate(() => {
       this.logger.flush().then(() => {
         setImmediate(() => this.emit('flushed', this.logger))
@@ -66,7 +69,7 @@ class SeqTransport extends TransportStream {
     })
   }
 
-  private mapLevel (level: string) {
+  private mapLevel (level: string){
     switch (level) {
       // Note: There is no equivalent for the Seq 'Fatal'
       case WinstonLevels.error: return 'Error'

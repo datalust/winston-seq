@@ -27,6 +27,8 @@ module.exports = {
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
     // ES
+    'arrow-spacing': ['error', { 'before': true, 'after': true }],
+    'space-before-function-paren': ['error', 'always'],
     'no-trailing-spaces': 'error',
     'max-len': ['error', { 'code': 80 }],
     'eol-last': ['error', 'always'],

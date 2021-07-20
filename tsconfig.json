@@ -1,19 +1,27 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
+    "lib": [
+      "ES2020"
+    ],
+    "module": "commonjs",
+    "target": "ES2020",
+    "esModuleInterop": true,
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "removeComments": false,
     "preserveConstEnums": true,
+    "strict": true,
     "alwaysStrict": true,
-    "allowJs": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "resolveJsonModule": true
   },
   "include": [
     "src/**/*"

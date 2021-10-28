@@ -27,7 +27,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "seq-logging": "^1.0.0",
+    "seq-logging": "^1.1.1",
     "winston-transport": "^4.4.0"
   },
   "devDependencies": {

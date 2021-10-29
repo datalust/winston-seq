@@ -30,7 +30,7 @@ class SeqTransport extends TransportStream {
     setImmediate(() => this.emit('logged', info))
 
     // trim info to avoid passing two copies of built-in properties
-    info.exception = info.exception ? info.stack : null
+    info.exception = info.exception ? info.stack : undefined
     const level = info.level || 'Debug'
     const message = info.message || ''
     const timestamp = info.timestamp || new Date()
@@ -59,6 +59,10 @@ class SeqTransport extends TransportStream {
   close (): void {
     this.logger.close()
     setImmediate(() => this.emit('closed'))
+  }
+
+  flush(): Promise<boolean> {
+    return this.logger.flush();
   }
 
   private mapLevel (level: string): string {

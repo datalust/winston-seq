@@ -1,8 +1,10 @@
 # `winston-seq`
 
-A Winston v3 transport for Seq that sends structured logs to the [Seq Log Server](https://datalust.co/seq).
+A [Winston](https://github.com/winstonjs/winston) v3 transport for Seq that sends structured logs to the [Seq Log Server](https://datalust.co/seq).
 
-## Getting Started
+![Structured logging with Seq](seq-log-search-feature-2220w.gif)
+
+## Install @datalust/winston-seq
 
 ```sh
 $ npm install @datalust/winston-seq
@@ -10,14 +12,15 @@ $ npm install @datalust/winston-seq
 $ yarn add @datalust/winston-seq
 ```
 
+## Configure Logging
+
 ```ts
 const winston = require('winston');
 const seq = require('@datalust/winston-seq');
 
 const logger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
-  defaultMeta: { service: 'user-service' },
+  defaultMeta: { /* application: 'your-app-name' */ },
   transports: [
     new winston.transports.Console({
         format: winston.format.simple(),
@@ -33,11 +36,38 @@ const logger = winston.createLogger({
 });
 ```
 
-TODO: explain config. Link to docs about api keys. Maybe add a Seq screenshot. 
+* `serverUrl` - the URL for your Seq server's ingestion
+* `apiKey` - (optional) The [Seq API Key](https://docs.datalust.co/docs/getting-logs-into-seq#api-keys) to use
+* `onError` - Callback to execute when an error occurs within the transport 
+* `handleExceptions` - (optional) Send a log [when an uncaught exception occurs](https://github.com/winstonjs/winston#handling-uncaught-exceptions-with-winston)
+* `handleRejections` - (optional) Send a log [when an unhandled promise rejection occurs](https://github.com/winstonjs/winston#handling-uncaught-promise-rejections-with-winston)
+
+## Send Logs
+
+Send structured logs, with parameters that can be used later for filtering and analysis:
+
+```ts
+logger.info("Hello {name}", {name: "World"});
+```
+
+Attach context by creating child loggers:
+
+```ts
+const taskLogger = logger.child({ activity: "purchase" });
+taskLogger.debug(
+    "User {user} purchase product {product} at ${price}", 
+    {
+        user: "Millie Gilbert",
+        product: "Yardtime Garden Shears",
+        price: 29.99
+    });
+```
+
+![An event in Seq](assets/purchase.png)
 
 ## Contributing
 
-First [Install Yarn](https://yarnpkg.com/getting-started/install) if you don't already have it. Next, add a `.env` file with content like:
+[Install Yarn](https://yarnpkg.com/getting-started/install) if you don't already have it. Next, add a `.env` file with content like:
 
 ```
 SEQ_URL=http://192.168.98.99:5341

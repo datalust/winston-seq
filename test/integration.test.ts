@@ -15,6 +15,7 @@ describe('@integration', () => {
       Needs a seq server. See README.md
       
       ***************`)
+      throw new Error('Seq required')
     }
 
     transport = new winstonSeq({
@@ -40,10 +41,20 @@ describe('@integration', () => {
     })
   })
 
-
   it('should send a log to seq', async () => {
-    const childLogger = logger.child({ requestId: '451' })
-    childLogger.info('Logging from child for the {n}th time, {user}!', { n: 7, user: 'Bob' })
+    const random = Math.round(Math.random() * 1000);
+    const childLogger = logger.child({ requestId: random });
+    childLogger.info('Test: should send a log to {target} with random {n}', { n: random+1, target: "Seq" });
+    const taskLogger = logger.child({ activity: "purchase" });
+    taskLogger.debug(
+      "User {user} purchase product {product} at ${price}", 
+      {
+        user: "Millie Gilbert",
+        product: "Yardtime Garden Shears",
+        price: 29.99
+      });
+      await transport.flush();
+      // query the seq api for my log
   })
 
 })

@@ -11,9 +11,6 @@ module.exports = {
   ignorePatterns: ['node_modules', 'dist', 'coverage'],
   rules: {
     // TS
-    '@typescript-eslint/no-explicit-any': [
-      'error', { 'fixToUnknown': true, 'ignoreRestArgs': true },
-    ],
     '@typescript-eslint/ban-ts-comment': 'off',
     // ES:off + TS:on
     'semi': 'off',
@@ -30,7 +27,7 @@ module.exports = {
     'arrow-spacing': ['error', { 'before': true, 'after': true }],
     'space-before-function-paren': ['error', 'always'],
     'no-trailing-spaces': 'error',
-    'max-len': ['error', { 'code': 80 }],
+    'max-len': ['error', { 'code': 110 }],
     'eol-last': ['error', 'always'],
     'no-tabs': ['error', { 'allowIndentationTabs': false }],
     'comma-spacing': ['error', { 'before': false, 'after': true }],

@@ -12,9 +12,7 @@
     "test:integration": "jest test/*.test.ts",
     "test:watch": "jest --watch test/*.spec.ts",
     "test:coverage": "jest --coverage",
-    "lint": "eslint --fix src/** test/**",
-    "seq-test": "docker rm seq-test -f && docker run --name seq-test -d -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest",
-    "cli": "docker run --rm --net host datalust/seqcli:latest log -m Hello -s http://localhost:5341"
+    "lint": "eslint --fix src/** test/**"
   },
   "husky": {
     "hooks": {
@@ -41,7 +39,8 @@
     "husky": "^7.0.1",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "dotenv": "^10.0.0"
   },
   "homepage": "https://github.com/datalust/seq-logging",
   "repository": {

@@ -2,7 +2,7 @@
 
 A [Winston](https://github.com/winstonjs/winston) v3 transport for Seq that sends structured logs to the [Seq Log Server](https://datalust.co/seq).
 
-![Structured logging with Seq](seq-log-search-feature-2220w.gif)
+![Structured logging with Seq](assets/seq-log-search-feature-2220w.gif)
 
 ## Install @datalust/winston-seq
 

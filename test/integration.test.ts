@@ -2,21 +2,24 @@
 import winston from 'winston'
 import winstonSeq from '../src/index'
 
+require('dotenv').config()
+
 let logger: winston.Logger, transport: winstonSeq
 
 describe('@integration', () => {
   beforeAll(() => {
-    console.log(`
-    ****************
+    if (!process.env.SEQ_URL) {
+      console.log(`
+      ****************
     
-    Needs a seq server
-    
-    ***************`)
-
+      Needs a seq server. See README.md
+      
+      ***************`)
+    }
 
     transport = new winstonSeq({
-      serverUrl: '*******',
-      apiKey: '********',
+      serverUrl: process.env.SEQ_URL,
+      apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,
       handleRejections: true,

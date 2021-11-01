@@ -42,8 +42,8 @@ describe('@integration', () => {
   })
 
 
-  it('should send a log to seq', async () => {
-    const random = Math.round(Math.random() * 1000).toString();
+  it('should send a log to seq with defaultMeta properties', async () => {
+    const random = getRandom();
     logger.debug(
       "User {user} purchase product {product} at ${price}", 
       {
@@ -59,8 +59,23 @@ describe('@integration', () => {
   })
 
   it('should send with child logger context', async () => {
-    const childLogger = logger.child({ requestId: '451' })
-    childLogger.info('Logging from child for the {n}th time, {user}!', { n: 7, user: 'Bob' })
+    const random = getRandom();
+    const childLogger = logger.child({ requestId: 451 })
+    childLogger.info('Logging from child', { random });
+    await transport.flush();
+    const event = await queryEvent(`random = '${random}'`);
+    expect(getPropertyFromEvent(event, 'requestId')).toBe(451);
+    expect(getMessageFromEvent(event)).toBe('Logging from child');
+  })
+
+  it('should send 100 events', async () => {
+    const random = getRandom();
+    for (let n = 1; n <= 100; n++) {
+      logger.info('Logging event number {n}', { n, random });
+    }
+    await transport.flush();
+    const events = await queryEvents(`random = '${random}'`);
+    expect(events.length).toBe(100);
   })
 
 })
@@ -69,10 +84,23 @@ function getPropertyFromEvent(event: any, propertyName: string) {
   return event.Properties.find((p: any) => p.Name === propertyName).Value;
 }
 
+function getMessageFromEvent(event: any) {
+  return event.MessageTemplateTokens[0].Text;
+}
+
+function getRandom() {
+  return Math.round(Math.random() * 1000000).toString();
+}
+
 async function queryEvent(filter: string) {
   const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
   if (response.data.Events.length === 0) {
     throw new Error('No events match filter ' + filter);
   }
   return response.data.Events[0];
+}
+
+async function queryEvents(filter: string) {
+  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=150&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+  return response.data.Events;
 }

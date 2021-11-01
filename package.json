@@ -54,5 +54,11 @@
     "winston-transport",
     "winston-seq",
     "seq"
+  ],
+  "files": [
+    "dist/index.d.ts",
+    "dist/index.d.ts.map",
+    "index.js",
+    "index.js.map"
   ]
 }

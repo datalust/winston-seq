@@ -36,10 +36,9 @@ class SeqTransport extends TransportStream {
     const timestamp = info.timestamp || new Date()
     delete info.level
     delete info.message
-    delete info.timestamp
 
     // differentiate events that come from handleExceptions: true or handleRejections: true
-    info.winstontLogTrigger = message.startsWith('uncaughtException')
+    info.winstonLogTrigger = message.startsWith('uncaughtException')
       ? 'uncaughtException'
       : message.startsWith('unhandledRejection')
         ? 'unhandledRejection'
@@ -50,7 +49,7 @@ class SeqTransport extends TransportStream {
       level: this.mapLevel(level),
       messageTemplate: message,
       properties: info,
-    })
+    });
 
     next()
   }

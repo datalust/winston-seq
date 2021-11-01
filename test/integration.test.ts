@@ -34,11 +34,8 @@ describe('@integration', () => {
     })
   })
 
-  afterAll(async () => {
-    return new Promise(resolve => {
-      logger.close()
-      resolve(null)
-    })
+  afterAll(() => {
+    logger.close()
   })
 
 
@@ -68,14 +65,60 @@ describe('@integration', () => {
     expect(getMessageFromEvent(event)).toBe('Logging from child');
   })
 
-  it('should send 100 events', async () => {
+  it('should send 10 events', async () => {
     const random = getRandom();
-    for (let n = 1; n <= 100; n++) {
+    for (let n = 1; n <= 10; n++) {
       logger.info('Logging event number {n}', { n, random });
     }
     await transport.flush();
     const events = await queryEvents(`random = '${random}'`);
-    expect(events.length).toBe(100);
+    expect(events.length).toBe(10);
+  })
+
+  it('should allow explicit timestamp', async () => {
+    const random = getRandom();
+    const tenMinutesAgo = new Date(new Date().getTime() - 600 * 1000);
+    logger.info("Logging at {now} with past timestamp {timestamp}", {
+      now: new Date(),
+      timestamp: tenMinutesAgo,
+      random
+    });
+    await transport.flush();
+    const event = await queryEvent(`random = '${random}'`);
+    expect(event).toBeDefined();
+    expect(getPropertyFromEvent(event, 'timestamp')).toBe(tenMinutesAgo.toISOString());
+
+  });
+
+  it('should work with different formats', async ()=>{
+    const random = getRandom();
+    const diffFormatTransport = new winstonSeq({
+      serverUrl: process.env.SEQ_INGESTION_URL,
+      apiKey: process.env.SEQ_API_KEY,
+      onError: (e => { console.error(e) }),
+      handleExceptions: true,
+      handleRejections: true,
+    });
+    const diffFormatLogger = winston.createLogger({
+      level: 'debug',
+      format: winston.format.combine(
+        winston.format.label({ label: 'right meow!' }),
+        winston.format.timestamp(),
+        winston.format.prettyPrint()
+      ),
+      defaultMeta: { application: 'differentFormatTests' },
+      transports: [
+        diffFormatTransport,
+      ],
+    });
+
+    diffFormatLogger.info("winston-seq: tests: should work with different {whats}", {whats: "formats", random});
+    diffFormatLogger.close();
+    await diffFormatTransport.flush();
+
+    const event = await queryEvent(`random = '${random}'`);
+    expect(event).toBeDefined();
+    expect(getPropertyFromEvent(event, 'whats')).toBe('formats');
   })
 
 })

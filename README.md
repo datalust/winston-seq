@@ -70,8 +70,35 @@ taskLogger.debug(
 [Install Yarn](https://yarnpkg.com/getting-started/install) if you don't already have it. Next, add a `.env` file with content like:
 
 ```
-SEQ_URL=http://192.168.98.99:5341
+SEQ_INGESTION_URL=http://192.168.98.99:5341
+SEQ_API_URL=http://192.168.98.99
 SEQ_API_KEY=fsf7sa9f9sf7s9df7
 ```
 
-Where `SEQ_URL` is the ingestion address of a test Seq server and `SEQ_API_KEY` is an API key with the `Ingest` permission. 
+Where `SEQ_INGESTION_URL` is the ingestion address of a test Seq server, `SEQ_API_URL` is the API address of the test server and `SEQ_API_KEY` is an [API key](https://docs.datalust.co/docs/getting-logs-into-seq#api-keys) with the `Ingest` and `Read` permissions. 
+
+### Scripts
+
+* To build:
+
+```
+$ yarn build
+```
+
+* To test:
+
+```
+$ yarn test
+```
+
+* Calculate test coverage:
+
+```
+$ yarn test:coverage
+```
+
+* Lint source
+
+``` 
+$ yarn lint
+```

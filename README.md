@@ -7,9 +7,9 @@ A [Winston](https://github.com/winstonjs/winston) v3 transport for Seq that send
 ## Install @datalust/winston-seq
 
 ```sh
-$ npm install @datalust/winston-seq
+$ npm install @datalust/winston-seq winston
 # Or with yarn
-$ yarn add @datalust/winston-seq
+$ yarn add @datalust/winston-seq winston
 ```
 
 ## Configure Logging

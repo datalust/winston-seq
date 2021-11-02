@@ -6,7 +6,7 @@ require('dotenv').config()
 
 let logger: winston.Logger, transport: winstonSeq
 
-describe('@integration', () => {
+describe('winston-seq', () => {
   beforeAll(() => {
     if (!process.env.SEQ_INGESTION_URL) {
       console.log(`
@@ -27,6 +27,10 @@ describe('@integration', () => {
     })
     logger = winston.createLogger({
       level: 'debug',
+      format: winston.format.combine(
+        winston.format.errors({ stack: true }),
+        winston.format.json(),
+      ),
       defaultMeta: { application: 'logtests' },
       transports: [
         transport,
@@ -35,9 +39,8 @@ describe('@integration', () => {
   })
 
   afterAll(() => {
-    logger.close()
+    if (!!logger) logger.close()
   })
-
 
   it('should send a log to seq with defaultMeta properties', async () => {
     const random = getRandom();
@@ -120,6 +123,43 @@ describe('@integration', () => {
     expect(event).toBeDefined();
     expect(getPropertyFromEvent(event, 'whats')).toBe('formats');
   })
+
+  it('should work with no API key', async ()=>{
+    const random = getRandom();
+    const anonTransport = new winstonSeq({
+      serverUrl: process.env.SEQ_INGESTION_URL,
+      onError: (e => { console.error(e) }),
+      handleExceptions: true,
+      handleRejections: true,
+    });
+    const anonLogger = winston.createLogger({
+      level: 'debug',
+      defaultMeta: { application: 'noAPItests' },
+      transports: [
+        anonTransport,
+      ],
+    });
+
+    anonLogger.info("winston-seq: tests: should work with no API key", {random});
+    anonLogger.close();
+    await anonTransport.flush();
+
+    const event = await queryEvent(`random = '${random}'`);
+    expect(event).toBeDefined();
+  })
+
+  it('should log exceptions', async ()=>{
+    const random = getRandom();
+    try{
+      throw new Error("Test error");
+    } catch (e) {
+      logger.error(e, {random});
+    }
+    await transport.flush();
+    const event = await queryEvent(`random = '${random}'`);
+    expect(event).toBeDefined();
+    expect(getPropertyFromEvent(event, 'stack').length).toBeGreaterThan(0);
+  });
 
 })
 

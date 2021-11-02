@@ -38,11 +38,13 @@ class SeqTransport extends TransportStream {
     delete info.message
 
     // differentiate events that come from handleExceptions: true or handleRejections: true
-    info.winstonLogTrigger = message.startsWith('uncaughtException')
-      ? 'uncaughtException'
-      : message.startsWith('unhandledRejection')
-        ? 'unhandledRejection'
-        : undefined
+    if (!!message && typeof message === 'string') {
+      info.winstonLogTrigger = message.startsWith('uncaughtException')
+        ? 'uncaughtException'
+        : message.startsWith('unhandledRejection')
+          ? 'unhandledRejection'
+          : undefined
+    }
 
     this.logger.emit({
       timestamp: timestamp,

@@ -20,6 +20,10 @@ const seq = require('@datalust/winston-seq');
 
 const logger = winston.createLogger({
   level: 'info',
+  format: winston.format.combine(  /* This is required to get errors to log with stack traces. See https://github.com/winstonjs/winston/issues/1498 */
+    winston.format.errors({ stack: true }),
+    winston.format.json(),
+  ),
   defaultMeta: { /* application: 'your-app-name' */ },
   transports: [
     new winston.transports.Console({
@@ -90,6 +94,8 @@ $ yarn build
 ```
 $ yarn test
 ```
+
+NB. One test will fail if the Seq server is configured to require an API key. 
 
 * Calculate test coverage:
 

@@ -31,11 +31,8 @@ class SeqTransport extends TransportStream {
 
     // trim info to avoid passing two copies of built-in properties
     info.exception = info.exception ? info.stack : undefined
-    const level = info.level || 'Debug'
     const message = info.message || ''
-    const timestamp = info.timestamp || new Date()
-    delete info.level
-    delete info.message
+    delete info.message // this will be in the @MessageTemplate anyway
 
     // differentiate events that come from handleExceptions: true or handleRejections: true
     if (!!message && typeof message === 'string') {
@@ -47,8 +44,8 @@ class SeqTransport extends TransportStream {
     }
 
     this.logger.emit({
-      timestamp: timestamp,
-      level: this.mapLevel(level),
+      timestamp: info.timestamp || new Date(),
+      level: info.level,
       messageTemplate: message,
       properties: info,
     });
@@ -65,34 +62,9 @@ class SeqTransport extends TransportStream {
   flush(): Promise<boolean> {
     return this.logger.flush();
   }
-
-  private mapLevel (level: string): string {
-    switch (level) {
-      // Note: There is no equivalent for the Seq 'Fatal'
-      case WinstonLevels.error: return 'Error'
-      case WinstonLevels.warn: return 'Warning'
-      case WinstonLevels.http:
-      case WinstonLevels.info: return 'Information'
-      case WinstonLevels.debug: return 'Debug'
-      case WinstonLevels.silly:
-      case WinstonLevels.verbose: return 'Verbose'
-      default:
-        throw new Error(`Unknown logging level ${level}`)
-    }
-  }
 }
 
 export default SeqTransport
-
-enum WinstonLevels {
-  error = 'error',
-  warn = 'warn',
-  info = 'info',
-  http = 'http',
-  verbose = 'verbose',
-  debug = 'debug',
-  silly = 'silly',
-}
 
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {

@@ -26,7 +26,7 @@ describe('winston-seq', () => {
       handleRejections: true,
     })
     logger = winston.createLogger({
-      level: 'debug',
+      level: 'silly',
       format: winston.format.combine(
         winston.format.errors({ stack: true }),
         winston.format.json(),
@@ -161,6 +161,23 @@ describe('winston-seq', () => {
     expect(getPropertyFromEvent(event, 'stack').length).toBeGreaterThan(0);
   });
 
+  it('should log all logging levels', async ()=>{
+    const random = getRandom();
+    const levels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
+    await Promise.all(levels.map(level => {
+        logger.log(level, "winston-seq: testing: logging levels for level {level}", {level, random, test: 'should log all logging levels'});
+        return transport.flush();
+      }));
+    const events = await queryEvents(`random = '${random}'`);
+    expect(events).toBeDefined();
+    expect(events.some((event: any) => event.Level == 'error')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'silly')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'http')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'warn')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'info')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'verbose')).toBe(true);
+    expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
+  });
 })
 
 function getPropertyFromEvent(event: any, propertyName: string) {

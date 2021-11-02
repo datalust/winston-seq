@@ -1,6 +1,6 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",
@@ -8,13 +8,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest test/*.spec.ts",
-    "test:integration": "jest test/*.test.ts",
-    "test:watch": "jest --watch test/*.spec.ts",
+    "test": "jest test/*.test.ts",
+    "test:watch": "jest --watch test/*.test.ts",
     "test:coverage": "jest --coverage",
-    "lint": "eslint --fix src/** test/**",
-    "seq-test": "docker rm seq-test -f && docker run --name seq-test -d -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest",
-    "cli": "docker run --rm --net host datalust/seqcli:latest log -m Hello -s http://localhost:5341"
+    "lint": "eslint --fix src/** test/**"
   },
   "husky": {
     "hooks": {
@@ -27,7 +24,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "seq-logging": "^1.0.0",
+    "seq-logging": "^1.1.1",
     "winston-transport": "^4.4.0"
   },
   "devDependencies": {
@@ -36,6 +33,8 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
+    "axios": "^0.24.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.30.0",
     "eslint-plugin-jest": "^24.3.6",
     "husky": "^7.0.1",
@@ -43,7 +42,7 @@
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.5"
   },
-  "homepage": "https://github.com/datalust/seq-logging",
+  "homepage": "https://github.com/datalust/winston-seq",
   "repository": {
     "type": "git",
     "url": "https://github.com/datalust/winston-seq.git"
@@ -54,5 +53,11 @@
     "winston-transport",
     "winston-seq",
     "seq"
+  ],
+  "files": [
+    "dist/index.d.ts",
+    "dist/index.d.ts.map",
+    "dist/index.js",
+    "dist/index.js.map"
   ]
 }

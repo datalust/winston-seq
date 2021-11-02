@@ -1,6 +1,6 @@
 # `winston-seq`
 
-A [Winston](https://github.com/winstonjs/winston) v3 transport that sends structured logs to the [Seq Log Server](https://datalust.co/seq).
+A [Winston](https://github.com/winstonjs/winston) v3 transport that sends structured logs to the [Seq log server](https://datalust.co/seq).
 
 ![Structured logging with Seq](assets/seq-log-search-feature-2220w.gif)
 
@@ -16,7 +16,7 @@ $ yarn add @datalust/winston-seq winston
 
 ```ts
 const winston = require('winston');
-const seq = require('@datalust/winston-seq');
+const SeqTransport = require('@datalust/winston-seq');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -29,7 +29,7 @@ const logger = winston.createLogger({
     new winston.transports.Console({
         format: winston.format.simple(),
     }),
-    new seq({
+    new SeqTransport({
       serverUrl: "https://your-seq-server:5341",
       apiKey: "your-api-key",
       onError: (e => { console.error(e) }),
@@ -43,12 +43,12 @@ const logger = winston.createLogger({
 * `serverUrl` - the URL for your Seq server's ingestion
 * `apiKey` - (optional) The [Seq API Key](https://docs.datalust.co/docs/getting-logs-into-seq#api-keys) to use
 * `onError` - Callback to execute when an error occurs within the transport 
-* `handleExceptions` - (optional) Send a log [when an uncaught exception occurs](https://github.com/winstonjs/winston#handling-uncaught-exceptions-with-winston)
-* `handleRejections` - (optional) Send a log [when an unhandled promise rejection occurs](https://github.com/winstonjs/winston#handling-uncaught-promise-rejections-with-winston)
+* `handleExceptions` - (optional) Send an event [when an uncaught exception occurs](https://github.com/winstonjs/winston#handling-uncaught-exceptions-with-winston)
+* `handleRejections` - (optional) Send an event [when an unhandled promise rejection occurs](https://github.com/winstonjs/winston#handling-uncaught-promise-rejections-with-winston)
 
 ## Send Logs
 
-Send structured logs, with parameters that can be used later for filtering and analysis:
+Send structured log events, with properties that can be used later for filtering and analysis:
 
 ```ts
 logger.info("Hello {name}", {name: "World"});

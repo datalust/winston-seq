@@ -29,25 +29,12 @@ class SeqTransport extends TransportStream {
   log (info: any, next: () => void): void {
     setImmediate(() => this.emit('logged', info))
 
-    // trim info to avoid passing two copies of built-in properties
-    info.exception = info.exception ? info.stack : undefined
-    const message = info.message || ''
-    delete info.message // this will be in the @MessageTemplate anyway
-
-    // differentiate events that come from handleExceptions: true or handleRejections: true
-    if (!!message && typeof message === 'string') {
-      info.winstonLogTrigger = message.startsWith('uncaughtException')
-        ? 'uncaughtException'
-        : message.startsWith('unhandledRejection')
-          ? 'unhandledRejection'
-          : undefined
-    }
-
     this.logger.emit({
       timestamp: info.timestamp || new Date(),
       level: info.level,
-      messageTemplate: message,
+      messageTemplate: info.message,
       properties: info,
+      exception: info.exception ? info.stack : ''
     });
 
     next()

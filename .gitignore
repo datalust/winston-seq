@@ -108,3 +108,5 @@ dist
 .vscode/*
 !.vscode/launch.json
 .idea/
+
+demo/

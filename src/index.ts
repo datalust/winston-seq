@@ -28,13 +28,15 @@ class SeqTransport extends TransportStream {
  */
   log (info: any, next: () => void): void {
     setImmediate(() => this.emit('logged', info))
+    const { level, message, exception, stack, ...props } = info;
 
     this.logger.emit({
-      timestamp: info.timestamp || new Date(),
-      level: info.level,
-      messageTemplate: info.message,
-      properties: info,
-      exception: info.exception ? info.stack : ''
+      timestamp: props.timestamp || new Date(),
+      level: level,
+      messageTemplate: message,
+      properties: props,
+      // sometimes exception is a boolean, sometimes it is undefined
+      exception: exception || stack || ''
     });
 
     next()

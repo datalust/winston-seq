@@ -56,6 +56,10 @@ describe('winston-seq', () => {
     const event = await queryEvent(`random = '${random}'`);
     expect(getPropertyFromEvent(event, 'user')).toBe("Millie Gilbert");
     expect(getPropertyFromEvent(event, 'application')).toBe("logtests");
+    expect(getPropertyFromEvent(event, 'product')).toBe("Yardtime Garden Shears");
+    expect(getPropertyFromEvent(event, 'price')).toBe(29.99);
+    expect(event.RenderedMessage).toBe('User Millie Gilbert purchase product Yardtime Garden Shears at $29.99');
+
   })
 
   it('should send with child logger context', async () => {
@@ -158,7 +162,7 @@ describe('winston-seq', () => {
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
     expect(event).toBeDefined();
-    expect(getPropertyFromEvent(event, 'stack').length).toBeGreaterThan(0);
+    expect(event.Exception).toMatch(/Error: Test error(.|\W)+/);
   });
 
   it('should log all logging levels', async ()=>{
@@ -193,7 +197,7 @@ function getRandom() {
 }
 
 async function queryEvent(filter: string) {
-  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
   if (response.data.Events.length === 0) {
     throw new Error('No events match filter ' + filter);
   }

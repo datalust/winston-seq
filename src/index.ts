@@ -5,7 +5,7 @@ import TransportStream from 'winston-transport'
  * Inherit from `winston-transport` so you can take advantage
  * of the base functionality and `.exceptions.handle()`.
  */
-class SeqTransport extends TransportStream {
+export class SeqTransport extends TransportStream {
   public logger: seq.Logger
 
   constructor (opts: seq.SeqLoggerConfig
@@ -52,8 +52,6 @@ class SeqTransport extends TransportStream {
     return this.logger.flush();
   }
 }
-
-export default SeqTransport
 
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {

@@ -1,10 +1,10 @@
 /* eslint-disable jest/expect-expect */
 import winston from 'winston'
-import winstonSeq from '../src/index'
+import { SeqTransport } from '../src/index'
 const axios = require('axios').default;
 require('dotenv').config()
 
-let logger: winston.Logger, transport: winstonSeq
+let logger: winston.Logger, transport: SeqTransport
 
 describe('winston-seq', () => {
   beforeAll(() => {
@@ -18,7 +18,7 @@ describe('winston-seq', () => {
       throw new Error('Seq required')
     }
 
-    transport = new winstonSeq({
+    transport = new SeqTransport({
       serverUrl: process.env.SEQ_INGESTION_URL,
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
@@ -99,7 +99,7 @@ describe('winston-seq', () => {
 
   it('should work with different formats', async ()=>{
     const random = getRandom();
-    const diffFormatTransport = new winstonSeq({
+    const diffFormatTransport = new SeqTransport({
       serverUrl: process.env.SEQ_INGESTION_URL,
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
@@ -130,7 +130,7 @@ describe('winston-seq', () => {
 
   it('should work with no API key', async ()=>{
     const random = getRandom();
-    const anonTransport = new winstonSeq({
+    const anonTransport = new SeqTransport({
       serverUrl: process.env.SEQ_INGESTION_URL,
       onError: (e => { console.error(e) }),
       handleExceptions: true,

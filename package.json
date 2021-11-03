@@ -1,6 +1,6 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",

@@ -49,7 +49,7 @@ const logger = winston.createLogger({
 * `handleExceptions` - (optional) Send an event [when an uncaught exception occurs](https://github.com/winstonjs/winston#handling-uncaught-exceptions-with-winston)
 * `handleRejections` - (optional) Send an event [when an unhandled promise rejection occurs](https://github.com/winstonjs/winston#handling-uncaught-promise-rejections-with-winston)
 
-## Send Logs
+## Send Log Events
 
 Send structured log events, with properties that can be used later for filtering and analysis:
 

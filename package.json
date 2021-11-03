@@ -1,10 +1,10 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",
-  "module": "dist/index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
@@ -23,9 +23,12 @@
     "preset": "ts-jest",
     "testEnvironment": "node"
   },
+  "peerDependencies": {
+    "winston": "^3.0.0"
+  },
   "dependencies": {
     "seq-logging": "^1.1.1",
-    "winston-transport": "^4.4.0"
+    "winston-transport": "^4.0.0"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",

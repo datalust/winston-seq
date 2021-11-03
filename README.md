@@ -1,5 +1,7 @@
 # `winston-seq`
 
+![npm](https://img.shields.io/npm/v/@datalust/winston-seq.svg)
+
 A [Winston](https://github.com/winstonjs/winston) v3 transport that sends structured logs to the [Seq log server](https://datalust.co/seq).
 
 ![Structured logging with Seq](assets/seq-log-search-feature-2220w.gif)

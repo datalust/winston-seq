@@ -36,7 +36,7 @@ export class SeqTransport extends TransportStream {
       messageTemplate: message,
       properties: props,
       // sometimes exception is a boolean, sometimes it is undefined
-      exception: exception || stack || ''
+      exception: exception || stack
     });
 
     next()

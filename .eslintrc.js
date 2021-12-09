@@ -13,14 +13,9 @@ module.exports = {
     // TS
     '@typescript-eslint/ban-ts-comment': 'off',
     // ES:off + TS:on
-    'semi': 'off',
-    '@typescript-eslint/semi': ['error', 'never'],
     'indent': 'off',
     '@typescript-eslint/indent': ['error', 2],
     'quotes': 'off',
-    '@typescript-eslint/quotes': [
-      'error', 'single', { 'allowTemplateLiterals': true },
-    ],
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
     // ES

@@ -12,10 +12,12 @@ describe('winston-seq', () => {
       console.log(`
       ****************
       
-      Needs a seq server. See README.md Contributing. 
+      SEQ_INGESTION_URL and SEQ_API_URL are required.
+
+      See Contributing in README.md for instructions. 
       
       ***************`);
-      throw new Error('Seq required')
+      throw new Error('Seq URLs required.')
     }
 
     transport = new SeqTransport({
@@ -130,7 +132,6 @@ describe('winston-seq', () => {
     const event = await queryEvent(`random = '${random}'`);
     expect(event).toBeDefined();
     expect(getPropertyFromEvent(event, 'timestamp')).toBe(threeMinutesAgo.toISOString());
-
   });
 
   it('should work with different formats', async () => {
@@ -195,7 +196,8 @@ describe('winston-seq', () => {
     try{
       throw new Error("Test error");
     } catch (e) {
-      logger.error(e, { random });
+      // Type coercion here because Winston's typings are stricter than its runtime API.
+      logger.error(e as string, { random });
     }
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
@@ -223,7 +225,42 @@ describe('winston-seq', () => {
     expect(events.some((event: any) => event.Level == 'verbose')).toBe(true);
     expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
   });
-})
+
+  it('should support level changes', async () => {
+    const first = getRandom(), second = getRandom();
+
+    const modifiableTransport = new SeqTransport({
+      level: 'info',
+      serverUrl: process.env.SEQ_INGESTION_URL,
+      apiKey: process.env.SEQ_API_KEY,
+      onError: (e => { console.error(e) }),
+      handleExceptions: true,
+      handleRejections: true,
+    })
+
+    const modifiableLogger = winston.createLogger({
+      level: 'silly',
+      defaultMeta: { application: 'logtests' },
+      transports: [
+        modifiableTransport,
+      ],
+    })
+
+    modifiableLogger.debug('A quiet little debug message', {random: first});
+    await modifiableTransport.flush();
+
+    modifiableTransport.level = 'debug';
+
+    modifiableLogger.debug('A quiet little debug message', {random: second});
+    await modifiableTransport.flush();
+
+    const firstEvent = await queryEvent(`random = '${first}'`);
+    expect(firstEvent).toBeUndefined();
+
+    const secondEvent = await queryEvent(`random = '${second}'`);
+    expect(secondEvent).toBeDefined();
+  });
+});
 
 function getPropertyFromEvent (event: any, propertyName: string) {
   return event.Properties.find((p: any) => p.Name === propertyName).Value;
@@ -240,7 +277,7 @@ function getRandom () {
 async function queryEvent (filter: string) {
   const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
   if (response.data.Events.length === 0) {
-    throw new Error('No events match filter ' + filter);
+    return undefined;
   }
   return response.data.Events[0];
 }

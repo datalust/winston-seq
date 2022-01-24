@@ -1,6 +1,6 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",
@@ -28,21 +28,22 @@
   },
   "dependencies": {
     "seq-logging": "^1.1.1",
-    "winston-transport": "^4.0.0"
+    "winston-transport": "^4.4.2"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
-    "axios": "^0.24.0",
+    "axios": "^0.25.0",
     "dotenv": "^10.0.0",
     "eslint": "^7.30.0",
     "eslint-plugin-jest": "^24.3.6",
     "husky": "^7.0.1",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "winston": "^3.4.0"
   },
   "homepage": "https://github.com/datalust/winston-seq",
   "repository": {

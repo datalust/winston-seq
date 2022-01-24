@@ -112,12 +112,15 @@ describe('winston-seq', () => {
       return { t, l };
     });
 
-    bulkLoggers.forEach(({ t, l }) => {
-      for (let n = 1; n <= 10000; n++) {
+    bulkLoggers.forEach(({ l }) => {
+      for (let n = 1; n <= 100; n++) {
         l.info('Logging event number {n}', { n, random });
       }
     });
-    await Promise.all(bulkLoggers.map(({ t, l }) => t.flush()));
+    await Promise.all(bulkLoggers.map(({ t, l }) => {
+      l.close();
+      return t.flush();
+    }));
   });
 
   it('should allow explicit timestamp', async () => {

@@ -27,7 +27,7 @@
     "winston": "^3.0.0"
   },
   "dependencies": {
-    "seq-logging": "^1.1.1",
+    "seq-logging": "^2.0.0",
     "winston-transport": "^4.4.2"
   },
   "devDependencies": {

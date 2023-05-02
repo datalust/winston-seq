@@ -227,8 +227,6 @@ describe('winston-seq', () => {
     expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
   });
 
-  jest.setTimeout(20000);
-
   it('should support level changes', async () => {
     const first = getRandom(), second = getRandom();
 

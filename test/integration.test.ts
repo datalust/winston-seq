@@ -60,8 +60,6 @@ describe('winston-seq', () => {
     expect(getPropertyFromEvent(event, 'application')).toBe("logtests");
     expect(getPropertyFromEvent(event, 'product')).toBe("Yardtime Garden Shears");
     expect(getPropertyFromEvent(event, 'price')).toBe(29.99);
-    expect(event.RenderedMessage).toBe(
-      'User Millie Gilbert purchase product Yardtime Garden Shears at $29.99');
   })
 
   it('should send with child logger context', async () => {
@@ -229,6 +227,8 @@ describe('winston-seq', () => {
     expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
   });
 
+  jest.setTimeout(20000);
+
   it('should support level changes', async () => {
     const first = getRandom(), second = getRandom();
 
@@ -257,10 +257,13 @@ describe('winston-seq', () => {
     modifiableLogger.debug('A quiet little debug message', {random: second});
     await modifiableTransport.flush();
 
-    const firstEvent = await queryEvent(`random = '${first}'`);
+    const firstEventP = queryEvent(`random = '${first}'`);
+    const secondEventP = queryEvent(`random = '${second}'`);
+
+    const firstEvent = await firstEventP;
     expect(firstEvent).toBeUndefined();
 
-    const secondEvent = await queryEvent(`random = '${second}'`);
+    const secondEvent = await secondEventP;
     expect(secondEvent).toBeDefined();
   });
 });

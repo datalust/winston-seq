@@ -10,18 +10,8 @@ let logger: winston.Logger, transport: SeqTransport
 
 describe('winston-seq', () => {
   before(() => {
-    if (!process.env.SEQ_INGESTION_URL) {
-      console.log(`
-      ****************
-      
-      Needs a seq server. See README.md Contributing. 
-      
-      ***************`);
-      throw new Error('Seq required')
-    }
-
     transport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,

@@ -9,12 +9,7 @@ export class SeqTransport extends TransportStream {
   public logger: seq.Logger
 
   constructor (opts: seq.SeqLoggerConfig
-  & TransportStream.TransportStreamOptions
-
-  // this is necessary because the change to the winston-transport types
-  // (https://github.com/winstonjs/winston-transport/commit/868d6577956f82ee0b021b119a4de938c61645f7)
-  // has not been published yet (Oct 2021)
-  & {handleRejections?: boolean}) {
+  & TransportStream.TransportStreamOptions) {
     super(opts)
     this.logger = new seq.Logger(opts)
     setImmediate(() => this.emit('opened'))

@@ -1,13 +1,15 @@
-/* eslint-disable jest/expect-expect */
+import { expect } from 'chai'
 import winston from 'winston'
-import { SeqTransport } from '../src/index'
-const axios = require('axios').default;
-require('dotenv').config()
+import axios from 'axios'
+import { config } from 'dotenv'
+import { SeqTransport } from '../src/index.js'
+
+config()
 
 let logger: winston.Logger, transport: SeqTransport
 
 describe('winston-seq', () => {
-  beforeAll(() => {
+  before(() => {
     if (!process.env.SEQ_INGESTION_URL) {
       console.log(`
       ****************
@@ -38,8 +40,8 @@ describe('winston-seq', () => {
     })
   })
 
-  afterAll(() => {
-    if (!!logger) logger.close()
+  after(() => {
+    if (logger) logger.close()
   })
 
   it('should send a log to seq with defaultMeta properties', async () => {
@@ -54,11 +56,11 @@ describe('winston-seq', () => {
       });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(getPropertyFromEvent(event, 'user')).toBe("Millie Gilbert");
-    expect(getPropertyFromEvent(event, 'application')).toBe("logtests");
-    expect(getPropertyFromEvent(event, 'product')).toBe("Yardtime Garden Shears");
-    expect(getPropertyFromEvent(event, 'price')).toBe(29.99);
-    expect(event.RenderedMessage).toBe('User Millie Gilbert purchase product Yardtime Garden Shears at $29.99');
+    expect(getPropertyFromEvent(event, 'user')).to.eq("Millie Gilbert");
+    expect(getPropertyFromEvent(event, 'application')).to.eq("logtests");
+    expect(getPropertyFromEvent(event, 'product')).to.eq("Yardtime Garden Shears");
+    expect(getPropertyFromEvent(event, 'price')).to.eq(29.99);
+    expect(event.RenderedMessage).to.eq('User Millie Gilbert purchase product Yardtime Garden Shears at $29.99');
 
   })
 
@@ -68,8 +70,8 @@ describe('winston-seq', () => {
     childLogger.info('Logging from child', { random });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(getPropertyFromEvent(event, 'requestId')).toBe(451);
-    expect(getMessageFromEvent(event)).toBe('Logging from child');
+    expect(getPropertyFromEvent(event, 'requestId')).to.eq(451);
+    expect(getMessageFromEvent(event)).to.eq('Logging from child');
   })
 
   it('should send 10 events', async () => {
@@ -79,7 +81,7 @@ describe('winston-seq', () => {
     }
     await transport.flush();
     const events = await queryEvents(`random = '${random}'`);
-    expect(events.length).toBe(10);
+    expect(events.length).to.eq(10);
   })
 
   it('should allow explicit timestamp', async () => {
@@ -92,8 +94,8 @@ describe('winston-seq', () => {
     });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(getPropertyFromEvent(event, 'timestamp')).toBe(tenMinutesAgo.toISOString());
+    expect(event).to.not.be.undefined;
+    expect(getPropertyFromEvent(event, 'timestamp')).to.eq(tenMinutesAgo.toISOString());
 
   });
 
@@ -124,8 +126,8 @@ describe('winston-seq', () => {
     await diffFormatTransport.flush();
 
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(getPropertyFromEvent(event, 'whats')).toBe('formats');
+    expect(event).to.not.be.undefined;
+    expect(getPropertyFromEvent(event, 'whats')).to.eq('formats');
   })
 
   it('should work with no API key', async ()=>{
@@ -149,7 +151,7 @@ describe('winston-seq', () => {
     await anonTransport.flush();
 
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
+    expect(event).to.not.be.undefined;
   })
 
   it('should log exceptions', async ()=>{
@@ -157,12 +159,12 @@ describe('winston-seq', () => {
     try{
       throw new Error("Test error");
     } catch (e) {
-      logger.error(e, {random});
+      logger.error(e as any, {random});
     }
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(event.Exception).toMatch(/Error: Test error(.|\W)+/);
+    expect(event).to.not.be.undefined;
+    expect(event.Exception).to.match(/Error: Test error(.|\W)+/);
   });
 
   it('should log all logging levels', async ()=>{
@@ -173,16 +175,22 @@ describe('winston-seq', () => {
         return transport.flush();
       }));
     const events = await queryEvents(`random = '${random}'`);
-    expect(events).toBeDefined();
-    expect(events.some((event: any) => event.Level == 'error')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'silly')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'http')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'warn')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'info')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'verbose')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
+    expect(events).to.not.be.undefined;
+    expect(events.some((event: any) => event.Level == 'error')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'silly')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'http')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'warn')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'info')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'verbose')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'debug')).to.eq(true);
   });
 })
+
+function seqUrl() {
+    let url = process.env.SEQ_API_URL ?? process.env.SEQ_INGESTION_URL ?? "http://localhost:5341";
+
+    return url.replace(/\/$/, '');
+}
 
 function getPropertyFromEvent(event: any, propertyName: string) {
   return event.Properties.find((p: any) => p.Name === propertyName).Value;
@@ -197,14 +205,14 @@ function getRandom() {
 }
 
 async function queryEvent(filter: string) {
-  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+  const response = await axios.get(`${seqUrl()}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100`);
   if (response.data.Events.length === 0) {
     throw new Error('No events match filter ' + filter);
   }
   return response.data.Events[0];
 }
 
-async function queryEvents(filter: string) {
-  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=150&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+async function queryEvents(filter: string): Promise<any[]> {
+  const response = await axios.get(`${seqUrl()}/api/events/signal?filter=${encodeURIComponent(filter)}&count=150&shortCircuitAfter=100`);
   return response.data.Events;
 }

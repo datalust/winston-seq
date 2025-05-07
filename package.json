@@ -11,7 +11,7 @@
     "build": "tsc",
     "pretest": "tsc -p ./tsconfig.test.json",
     "test": "mocha dist.test/**/*.test.js",
-    "lint": "eslint --fix src/** test/**"
+    "lint": "eslint src/** test/**"
   },
   "peerDependencies": {
     "winston": "^3.17.0"

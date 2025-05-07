@@ -1,25 +1,28 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
+    "target": "es2020",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "alwaysStrict": true,
     "allowJs": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "resolveJsonModule": true
+    "types": ["node", "winston", "mocha", "chai"]
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ],
+    "src/**/*",
+    "test/**/*"
+  ]
 }

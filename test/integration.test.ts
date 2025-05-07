@@ -177,7 +177,7 @@ describe('winston-seq', () => {
 })
 
 function seqUrl() {
-    let url = process.env.SEQ_API_URL ?? process.env.SEQ_INGESTION_URL ?? "http://localhost:5341";
+    const url = process.env.SEQ_API_URL ?? process.env.SEQ_INGESTION_URL ?? "http://localhost:5341";
 
     return url.replace(/\/$/, '');
 }

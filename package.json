@@ -9,8 +9,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "pretest": "tsc -p ./tsconfig.test.json",
-    "test": "mocha dist.test/**/*.test.js",
+    "pretest": "tsc",
+    "test": "mocha dist/**/*.test.js",
     "lint": "eslint src/** test/**"
   },
   "peerDependencies": {

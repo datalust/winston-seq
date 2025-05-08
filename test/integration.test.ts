@@ -74,6 +74,45 @@ describe('winston-seq', () => {
     expect(events.length).to.eq(10);
   })
 
+  it('should send events via many loggers', async () => {
+    // This test exists to investigate issue https://github.com/datalust/winston-seq/issues/8
+    // A warning is written if many loggers share a transport.
+    // This behaviour comes from winston. See https://github.com/winstonjs/winston/issues/1334
+    const random = getRandom();
+
+    const bulkLoggers = [...Array(5).keys()].map(() => {
+      const t = new SeqTransport({
+        serverUrl: seqUrl(),
+        apiKey: process.env.SEQ_API_KEY,
+        onError: (e => { console.error(e) }),
+        handleExceptions: true,
+        handleRejections: true,
+      });
+      const l = winston.createLogger({
+        level: 'silly',
+        format: winston.format.combine(
+          winston.format.errors({ stack: true }),
+          winston.format.json(),
+        ),
+        defaultMeta: { application: 'logtests' },
+        transports: [
+          t,
+        ],
+      });
+      return { t, l };
+    });
+
+    bulkLoggers.forEach(({ l }) => {
+      for (let n = 1; n <= 100; n++) {
+        l.info('Logging event number {n}', { n, random });
+      }
+    });
+    await Promise.all(bulkLoggers.map(({ t, l }) => {
+      l.close();
+      return t.flush();
+    }));
+  })
+
   it('should allow explicit timestamp', async () => {
     const random = getRandom();
     const tenMinutesAgo = new Date(new Date().getTime() - 600 * 1000);
@@ -92,7 +131,7 @@ describe('winston-seq', () => {
   it('should work with different formats', async ()=>{
     const random = getRandom();
     const diffFormatTransport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,
@@ -123,7 +162,7 @@ describe('winston-seq', () => {
   it('should work with no API key', async ()=>{
     const random = getRandom();
     const anonTransport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       onError: (e => { console.error(e) }),
       handleExceptions: true,
       handleRejections: true,
@@ -180,7 +219,7 @@ describe('winston-seq', () => {
 
     const modifiableTransport = new SeqTransport({
       level: 'info',
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,

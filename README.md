@@ -4,20 +4,13 @@ A [Winston](https://github.com/winstonjs/winston) v3 transport that sends struct
 
 ![Structured logging with Seq](assets/seq-log-search-feature-2220w.gif)
 
-## Install @datalust/winston-seq
+## Getting started
 
-```sh
-$ npm install @datalust/winston-seq winston
-# Or with yarn
-$ yarn add @datalust/winston-seq winston
-```
-
-## Configure Logging
+Add the `@datalust/winston-seq winston` and `winston` packages to your `package.json`, and configure `winston` with a `SeqTransport`:
 
 ```ts
-const winston = require('winston');
-const { SeqTransport } = require('@datalust/winston-seq');
-// or import { SeqTransport } from '@datalust/winston-seq';
+import winston from 'winston';
+import { SeqTransport } from '@datalust/winston-seq';
 
 const logger = winston.createLogger({
   level: 'info',
@@ -69,43 +62,3 @@ taskLogger.debug(
 ```
 
 ![An event in Seq](assets/purchase.png)
-
-## Contributing
-
-[Install Yarn](https://yarnpkg.com/getting-started/install) if you don't already have it. Next, add a `.env` file with content like:
-
-```
-SEQ_INGESTION_URL=http://192.168.98.99:5341
-SEQ_API_URL=http://192.168.98.99
-SEQ_API_KEY=fsf7sa9f9sf7s9df7
-```
-
-Where `SEQ_INGESTION_URL` is the ingestion address of a test Seq server, `SEQ_API_URL` is the API address of the test server and `SEQ_API_KEY` is an [API key](https://docs.datalust.co/docs/getting-logs-into-seq#api-keys) with the `Ingest` and `Read` permissions. 
-
-### Scripts
-
-* To build:
-
-```
-$ yarn build
-```
-
-* To test:
-
-```
-$ yarn test
-```
-
-NB. One test will fail if the Seq server is configured to require an API key. 
-
-* Calculate test coverage:
-
-```
-$ yarn test:coverage
-```
-
-* Lint source
-
-``` 
-$ yarn lint
-```

@@ -1,27 +1,17 @@
-/* eslint-disable jest/expect-expect */
+import { expect } from 'chai'
 import winston from 'winston'
-import { SeqTransport } from '../src/index'
-const axios = require('axios').default;
-require('dotenv').config()
+import axios from 'axios'
+import { config } from 'dotenv'
+import { SeqTransport } from '../src/index.js'
+
+config()
 
 let logger: winston.Logger, transport: SeqTransport
 
 describe('winston-seq', () => {
-  beforeAll(() => {
-    if (!process.env.SEQ_INGESTION_URL) {
-      console.log(`
-      ****************
-      
-      SEQ_INGESTION_URL and SEQ_API_URL are required.
-
-      See Contributing in README.md for instructions. 
-      
-      ***************`);
-      throw new Error('Seq URLs required.')
-    }
-
+  before(() => {
     transport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,
@@ -40,26 +30,28 @@ describe('winston-seq', () => {
     })
   })
 
-  afterAll(() => {
+  after(() => {
     if (logger) logger.close()
   })
 
   it('should send a log to seq with defaultMeta properties', async () => {
     const random = getRandom();
     logger.debug(
-      "User {user} purchase product {product} at ${price}",
+      "User {user} purchase product {product} at ${price}", 
       {
         user: "Millie Gilbert",
         product: "Yardtime Garden Shears",
         price: 29.99,
-        random,
+        random
       });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(getPropertyFromEvent(event, 'user')).toBe("Millie Gilbert");
-    expect(getPropertyFromEvent(event, 'application')).toBe("logtests");
-    expect(getPropertyFromEvent(event, 'product')).toBe("Yardtime Garden Shears");
-    expect(getPropertyFromEvent(event, 'price')).toBe(29.99);
+    expect(getPropertyFromEvent(event, 'user')).to.eq("Millie Gilbert");
+    expect(getPropertyFromEvent(event, 'application')).to.eq("logtests");
+    expect(getPropertyFromEvent(event, 'product')).to.eq("Yardtime Garden Shears");
+    expect(getPropertyFromEvent(event, 'price')).to.eq(29.99);
+    expect(event.RenderedMessage).to.eq('User Millie Gilbert purchase product Yardtime Garden Shears at $29.99');
+
   })
 
   it('should send with child logger context', async () => {
@@ -68,8 +60,8 @@ describe('winston-seq', () => {
     childLogger.info('Logging from child', { random });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(getPropertyFromEvent(event, 'requestId')).toBe(451);
-    expect(getMessageFromEvent(event)).toBe('Logging from child');
+    expect(getPropertyFromEvent(event, 'requestId')).to.eq(451);
+    expect(getMessageFromEvent(event)).to.eq('Logging from child');
   })
 
   it('should send 10 events', async () => {
@@ -79,7 +71,7 @@ describe('winston-seq', () => {
     }
     await transport.flush();
     const events = await queryEvents(`random = '${random}'`);
-    expect(events.length).toBe(10);
+    expect(events.length).to.eq(10);
   })
 
   it('should send events via many loggers', async () => {
@@ -90,7 +82,7 @@ describe('winston-seq', () => {
 
     const bulkLoggers = [...Array(5).keys()].map(() => {
       const t = new SeqTransport({
-        serverUrl: process.env.SEQ_INGESTION_URL,
+        serverUrl: seqUrl(),
         apiKey: process.env.SEQ_API_KEY,
         onError: (e => { console.error(e) }),
         handleExceptions: true,
@@ -119,26 +111,27 @@ describe('winston-seq', () => {
       l.close();
       return t.flush();
     }));
-  });
+  })
 
   it('should allow explicit timestamp', async () => {
     const random = getRandom();
-    const threeMinutesAgo = new Date(new Date().getTime() - 180 * 1000);
+    const tenMinutesAgo = new Date(new Date().getTime() - 600 * 1000);
     logger.info("Logging at {now} with past timestamp {timestamp}", {
       now: new Date(),
-      timestamp: threeMinutesAgo,
-      random,
+      timestamp: tenMinutesAgo,
+      random
     });
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(getPropertyFromEvent(event, 'timestamp')).toBe(threeMinutesAgo.toISOString());
+    expect(event).to.not.be.undefined;
+    expect(getPropertyFromEvent(event, 'timestamp')).to.eq(tenMinutesAgo.toISOString());
+
   });
 
-  it('should work with different formats', async () => {
+  it('should work with different formats', async ()=>{
     const random = getRandom();
     const diffFormatTransport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,
@@ -157,21 +150,19 @@ describe('winston-seq', () => {
       ],
     });
 
-    diffFormatLogger.info(
-      "winston-seq: tests: should work with different {whats}",
-      { whats: "formats", random });
+    diffFormatLogger.info("winston-seq: tests: should work with different {whats}", {whats: "formats", random});
     diffFormatLogger.close();
     await diffFormatTransport.flush();
 
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(getPropertyFromEvent(event, 'whats')).toBe('formats');
+    expect(event).to.not.be.undefined;
+    expect(getPropertyFromEvent(event, 'whats')).to.eq('formats');
   })
 
-  it('should work with no API key', async () => {
+  it('should work with no API key', async ()=>{
     const random = getRandom();
     const anonTransport = new SeqTransport({
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       onError: (e => { console.error(e) }),
       handleExceptions: true,
       handleRejections: true,
@@ -184,47 +175,43 @@ describe('winston-seq', () => {
       ],
     });
 
-    anonLogger.info("winston-seq: tests: should work with no API key", { random });
+    anonLogger.info("winston-seq: tests: should work with no API key", {random});
     anonLogger.close();
     await anonTransport.flush();
 
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
+    expect(event).to.not.be.undefined;
   })
 
-  it('should log exceptions', async () => {
+  it('should log exceptions', async ()=>{
     const random = getRandom();
     try{
       throw new Error("Test error");
     } catch (e) {
-      // Type coercion here because Winston's typings are stricter than its runtime API.
-      logger.error(e as string, { random });
+      logger.error(e as any, {random});
     }
     await transport.flush();
     const event = await queryEvent(`random = '${random}'`);
-    expect(event).toBeDefined();
-    expect(event.Exception).toMatch(/Error: Test error(.|\W)+/);
+    expect(event).to.not.be.undefined;
+    expect(event.Exception).to.match(/Error: Test error(.|\W)+/);
   });
 
-  it('should log all logging levels', async () => {
+  it('should log all logging levels', async ()=>{
     const random = getRandom();
     const levels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
-    levels.map(level => {
-      logger.log(
-        level,
-        "winston-seq: testing: logging levels",
-        { level, random, test: 'should log all logging levels' });
-    });
-    await transport.flush();
+    await Promise.all(levels.map(level => {
+        logger.log(level, "winston-seq: testing: logging levels for level {level}", {level, random, test: 'should log all logging levels'});
+        return transport.flush();
+      }));
     const events = await queryEvents(`random = '${random}'`);
-    expect(events).toBeDefined();
-    expect(events.some((event: any) => event.Level == 'error')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'silly')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'http')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'warn')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'info')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'verbose')).toBe(true);
-    expect(events.some((event: any) => event.Level == 'debug')).toBe(true);
+    expect(events).to.not.be.undefined;
+    expect(events.some((event: any) => event.Level == 'error')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'silly')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'http')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'warn')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'info')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'verbose')).to.eq(true);
+    expect(events.some((event: any) => event.Level == 'debug')).to.eq(true);
   });
 
   it('should support level changes', async () => {
@@ -232,7 +219,7 @@ describe('winston-seq', () => {
 
     const modifiableTransport = new SeqTransport({
       level: 'info',
-      serverUrl: process.env.SEQ_INGESTION_URL,
+      serverUrl: seqUrl(),
       apiKey: process.env.SEQ_API_KEY,
       onError: (e => { console.error(e) }),
       handleExceptions: true,
@@ -259,34 +246,40 @@ describe('winston-seq', () => {
     const secondEventP = queryEvent(`random = '${second}'`);
 
     const firstEvent = await firstEventP;
-    expect(firstEvent).toBeUndefined();
+    expect(firstEvent).to.be.undefined;
 
     const secondEvent = await secondEventP;
-    expect(secondEvent).toBeDefined();
+    expect(secondEvent).to.not.be.undefined;
   });
-});
+})
 
-function getPropertyFromEvent (event: any, propertyName: string) {
+function seqUrl() {
+    const url = process.env.SEQ_API_URL ?? process.env.SEQ_INGESTION_URL ?? "http://localhost:5341";
+
+    return url.replace(/\/$/, '');
+}
+
+function getPropertyFromEvent(event: any, propertyName: string) {
   return event.Properties.find((p: any) => p.Name === propertyName).Value;
 }
 
-function getMessageFromEvent (event: any) {
+function getMessageFromEvent(event: any) {
   return event.MessageTemplateTokens[0].Text;
 }
 
-function getRandom () {
+function getRandom() {
   return Math.round(Math.random() * 1000000).toString();
 }
 
-async function queryEvent (filter: string) {
-  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+async function queryEvent(filter: string) {
+  const response = await axios.get(`${seqUrl()}/api/events/signal?filter=${encodeURIComponent(filter)}&count=1&render=true&shortCircuitAfter=100`);
   if (response.data.Events.length === 0) {
     return undefined;
   }
   return response.data.Events[0];
 }
 
-async function queryEvents (filter: string) {
-  const response = await axios.get(`${process.env.SEQ_API_URL}/api/events/signal?filter=${encodeURIComponent(filter)}&count=150&shortCircuitAfter=100&apiKey=${process.env.SEQ_API_KEY}`);
+async function queryEvents(filter: string): Promise<any[]> {
+  const response = await axios.get(`${seqUrl()}/api/events/signal?filter=${encodeURIComponent(filter)}&count=150&shortCircuitAfter=100`);
   return response.data.Events;
 }

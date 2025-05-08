@@ -1,49 +1,38 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:watch": "jest --watch test/*.test.ts",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint --fix src/** test/**"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint && jest --onlyChanged",
-      "pre-push": "yarn lint && jest"
-    }
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
+    "pretest": "tsc",
+    "test": "mocha dist/**/*.test.js",
+    "lint": "eslint src/** test/**"
   },
   "peerDependencies": {
-    "winston": "^3.0.0"
+    "winston": "^3.17.0"
   },
   "dependencies": {
-    "seq-logging": "^2.0.0",
-    "winston-transport": "^4.4.2"
+    "seq-logging": "^3.0.0",
+    "winston-transport": "^4.9.0"
   },
   "devDependencies": {
-    "@tsconfig/recommended": "^1.0.1",
-    "@types/jest": "^26.0.24",
-    "@typescript-eslint/eslint-plugin": "^4.28.2",
-    "@typescript-eslint/parser": "^4.28.2",
-    "axios": "^0.25.0",
-    "dotenv": "^10.0.0",
-    "eslint": "^7.30.0",
-    "eslint-plugin-jest": "^24.3.6",
-    "husky": "^7.0.1",
-    "jest": "^27.0.6",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5",
-    "winston": "^3.4.0"
+    "@types/node": "^22.13.14",
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "eslint": "^9.26.0",
+    "@eslint/js": "9.26.0",
+    "typescript-eslint": "^8.32.0",
+    "typescript": "^5.8.3",
+    "mocha": "^11.2.2",
+    "chai": "^5.2.0",
+    "winston": "^3.17.0"
   },
   "homepage": "https://github.com/datalust/winston-seq",
   "repository": {

@@ -1,11 +1,11 @@
 {
   "name": "@datalust/winston-seq",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "Apache-2.0",
   "description": "A Winston v3 transport for Seq",
   "author": "Datalust and contributors",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -47,9 +47,9 @@
     "seq"
   ],
   "files": [
-    "dist/index.d.ts",
-    "dist/index.d.ts.map",
-    "dist/index.js",
-    "dist/index.js.map"
+    "dist/src/index.d.ts",
+    "dist/src/index.d.ts.map",
+    "dist/src/index.js",
+    "dist/src/index.js.map"
   ]
 }

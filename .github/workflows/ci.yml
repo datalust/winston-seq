@@ -1,4 +1,7 @@
-name: Test
+# Builds and tests the package. Successful runs on `main` trigger `publish.yml`,
+# which publishes the package tarball uploaded by this workflow.
+
+name: CI
 
 on:
   push:
@@ -6,18 +9,32 @@ on:
   pull_request:
     branches: [ dev, main ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 22.x
-      - run: docker run -d --name seq -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest
+      - run: docker run -d --name seq -e ACCEPT_EULA=Y -e SEQ_FIRSTRUN_NOAUTHENTICATION=true -p 5341:80 datalust/seq:latest
       - run: npm ci
       - run: npm run build
+      - name: Wait for Seq
+        run: curl --silent --fail --retry 30 --retry-delay 1 --retry-all-errors http://localhost:5341/api > /dev/null
       - run: npm run test
       - run: npm run lint
+      - name: Pack
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm pack
+      - name: Upload package
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: '*.tgz'
+          if-no-files-found: error

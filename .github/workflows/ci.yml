@@ -21,9 +21,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-      - run: docker run -d --name seq -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest
+      - run: docker run -d --name seq -e ACCEPT_EULA=Y -e SEQ_FIRSTRUN_NOAUTHENTICATION=true -p 5341:80 datalust/seq:latest
       - run: npm ci
       - run: npm run build
+      - name: Wait for Seq
+        run: curl --silent --fail --retry 30 --retry-delay 1 --retry-all-errors http://localhost:5341/api > /dev/null
       - run: npm run test
       - run: npm run lint
       - name: Pack

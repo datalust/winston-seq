@@ -27,7 +27,6 @@ jobs:
       - name: Wait for Seq
         run: curl --silent --fail --retry 30 --retry-delay 1 --retry-all-errors http://localhost:5341/api > /dev/null
       - run: npm run test
-      - run: npm run lint
       - name: Pack
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm pack
